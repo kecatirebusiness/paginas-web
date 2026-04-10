@@ -1,0 +1,2043 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Libros — Gustavo Vidente</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --gold: #C9A84C;
+  --gold-light: #E8C97A;
+  --gold-dim: rgba(201,168,76,0.15);
+  --dark: #050508;
+  --dark-2: #0C0B12;
+  --dark-3: #13111C;
+  --dark-4: #1C1927;
+  --text: #EDE8DC;
+  --muted: #9A9080;
+}
+
+html { scroll-behavior: auto; }
+
+body {
+  font-family: 'Raleway', sans-serif;
+  background: var(--dark);
+  color: var(--text);
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ── CURSOR ── */
+#cursor-dot {
+  width: 6px; height: 6px;
+  background: var(--gold);
+  border-radius: 50%;
+  position: fixed;
+  top: 0; left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+}
+#cursor-ring {
+  width: 38px; height: 38px;
+  border: 1px solid rgba(201,168,76,0.5);
+  border-radius: 50%;
+  position: fixed;
+  top: 0; left: 0;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s, height 0.3s, border-color 0.3s;
+}
+#cursor-ring.hovering {
+  width: 60px; height: 60px;
+  border-color: var(--gold);
+}
+
+/* ── CANVAS STARFIELD ── */
+#stars {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 4rem;
+  mix-blend-mode: normal;
+}
+nav::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(5,5,8,0.9) 0%, transparent 100%);
+  z-index: -1;
+  pointer-events: none;
+}
+.nav-logo {
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.25em;
+  color: var(--gold);
+  text-decoration: none;
+}
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+.nav-link {
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+.nav-link:hover { color: var(--gold); }
+.nav-wa {
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--dark);
+  background: var(--gold);
+  padding: 0.6rem 1.4rem;
+  text-decoration: none;
+  transition: background 0.3s;
+}
+.nav-wa:hover { background: var(--gold-light); }
+
+/* ── HERO ── */
+.hero {
+  position: relative;
+  z-index: 1;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+}
+.hero-glow {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px; height: 600px;
+  background: radial-gradient(ellipse, rgba(201,168,76,0.07) 0%, transparent 70%);
+  pointer-events: none;
+  animation: breathe 5s ease-in-out infinite;
+}
+@keyframes breathe {
+  0%,100% { opacity: 0.5; transform: translate(-50%,-50%) scale(1); }
+  50% { opacity: 1; transform: translate(-50%,-50%) scale(1.15); }
+}
+.hero-eye {
+  margin-bottom: 2rem;
+  opacity: 0;
+}
+.hero-tag {
+  font-size: 0.62rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 1.5rem;
+  opacity: 0;
+}
+.hero-title {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(3rem, 8vw, 7rem);
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  line-height: 0.95;
+  color: var(--text);
+  overflow: hidden;
+}
+.hero-title .line {
+  display: block;
+  transform: translateY(110%);
+  opacity: 0;
+}
+.hero-title .line-gold {
+  color: var(--gold);
+  font-style: italic;
+  font-weight: 400;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.5rem, 4vw, 3.5rem);
+  letter-spacing: 0.2em;
+  margin-top: 0.3rem;
+}
+.hero-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1rem, 2vw, 1.4rem);
+  font-style: italic;
+  color: var(--muted);
+  margin-top: 2rem;
+  opacity: 0;
+}
+.hero-sub-extended {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(0.9rem, 1.6vw, 1.15rem);
+  font-style: italic;
+  color: var(--muted);
+  line-height: 1.85;
+  margin-top: 0.8rem;
+  max-width: 520px;
+  opacity: 0;
+}
+.hero-scroll-hint {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  opacity: 0;
+}
+.hero-scroll-hint span {
+  font-size: 0.58rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.scroll-line-anim {
+  width: 1px;
+  height: 50px;
+  background: linear-gradient(180deg, var(--gold), transparent);
+  animation: scrollDown 2s ease-in-out infinite;
+  transform-origin: top;
+}
+@keyframes scrollDown {
+  0% { transform: scaleY(0); opacity: 1; }
+  60% { transform: scaleY(1); opacity: 1; }
+  100% { transform: scaleY(1); opacity: 0; }
+}
+
+/* ── BOOKS SECTION ── */
+.books-section {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── BOOK PANEL ── */
+.book-panel {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding: 6rem 0;
+}
+.book-panel:nth-child(odd) .book-inner { flex-direction: row; }
+.book-panel:nth-child(even) .book-inner { flex-direction: row-reverse; }
+
+.book-panel-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.book-panel-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--dark-2);
+  opacity: 0;
+  transition: opacity 0.6s;
+}
+
+.book-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 5rem;
+  display: flex;
+  align-items: center;
+  gap: 8rem;
+}
+
+/* ── REALISTIC 3D BOOK ── */
+
+/* Float animation */
+@keyframes floatBook {
+  0%   { transform: rotateY(-28deg) rotateX(6deg) translateY(0px); }
+  50%  { transform: rotateY(-22deg) rotateX(4deg) translateY(-14px); }
+  100% { transform: rotateY(-28deg) rotateX(6deg) translateY(0px); }
+}
+@keyframes floatShadow {
+  0%,100% { transform: translateX(-50%) scaleX(1); opacity: 0.55; }
+  50%      { transform: translateX(-50%) scaleX(0.82); opacity: 0.28; }
+}
+
+.book-3d-wrap {
+  flex-shrink: 0;
+  perspective: 1200px;
+  perspective-origin: 60% 50%;
+  width: 700px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem 4rem;
+}
+.book-cover-img {
+  width: 650px;
+  height: auto;
+  border-radius: 3px;
+  filter: drop-shadow(0 15px 35px rgba(0,0,0,0.6));
+  animation: floatBook 5s ease-in-out infinite;
+  transition: transform 0.7s cubic-bezier(0.16,1,0.3,1);
+  cursor: pointer;
+}
+.book-3d-wrap:hover .book-cover-img {
+  transform: scale(1.05) translateY(-8px);
+  filter: drop-shadow(0 20px 45px rgba(0,0,0,0.7));
+}
+.mobile-book-cover-img {
+  width: 260px;
+  height: auto;
+  border-radius: 2px;
+  filter: drop-shadow(0 8px 20px rgba(0,0,0,0.5));
+}
+.bundle-mini-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 1px 3px 3px 1px;
+}
+
+.book-3d {
+  width: 210px;
+  height: 300px;
+  position: relative;
+  transform-style: preserve-3d;
+  animation: floatBook 5s ease-in-out infinite;
+  will-change: transform;
+  cursor: pointer;
+}
+.book-3d-wrap:hover .book-3d {
+  animation-play-state: paused;
+  transform: rotateY(-10deg) rotateX(4deg) translateY(-8px) !important;
+  transition: transform 0.7s cubic-bezier(0.16,1,0.3,1);
+}
+
+/* ── FRONT COVER ── */
+.book-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  transform: translateZ(18px);
+  border-radius: 1px 3px 3px 1px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0;
+}
+
+/* Leather texture overlay on front */
+.book-face::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      rgba(0,0,0,0.06) 3px,
+      rgba(0,0,0,0.06) 4px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 6px,
+      rgba(255,255,255,0.015) 6px,
+      rgba(255,255,255,0.015) 7px
+    );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Glossy light reflection */
+.book-face::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 55%;
+  background: linear-gradient(
+    160deg,
+    rgba(255,255,255,0.10) 0%,
+    rgba(255,255,255,0.04) 40%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 2;
+  border-radius: 1px 3px 0 0;
+}
+
+/* Inner border / frame on cover */
+.book-face-inner {
+  position: relative;
+  z-index: 3;
+  width: 100%; height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.4rem 1.2rem;
+}
+
+.book-face-border {
+  position: absolute;
+  inset: 10px;
+  border: 0.5px solid rgba(201,168,76,0.45);
+  pointer-events: none;
+  z-index: 4;
+}
+.book-face-border::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border: 0.5px solid rgba(201,168,76,0.18);
+}
+
+/* Corner ornaments */
+.book-corner {
+  position: absolute;
+  width: 14px; height: 14px;
+  z-index: 5;
+}
+.book-corner svg { width: 100%; height: 100%; }
+.book-corner.tl { top: 10px; left: 10px; }
+.book-corner.tr { top: 10px; right: 10px; transform: rotate(90deg); }
+.book-corner.bl { bottom: 10px; left: 10px; transform: rotate(-90deg); }
+.book-corner.br { bottom: 10px; right: 10px; transform: rotate(180deg); }
+
+/* Book top section */
+.book-top {
+  text-align: center;
+  position: relative;
+  z-index: 6;
+}
+.book-number {
+  font-family: 'Cinzel', serif;
+  font-size: 0.48rem;
+  letter-spacing: 0.38em;
+  color: var(--gold);
+  opacity: 0.75;
+  margin-bottom: 0.6rem;
+  text-transform: uppercase;
+  display: block;
+}
+
+/* Central symbol — replaced emoji with SVG art */
+.book-symbol-wrap {
+  position: relative;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 70px; height: 70px;
+  margin: 0 auto;
+}
+.book-symbol-wrap svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 6px rgba(201,168,76,0.4));
+}
+
+/* Book bottom text */
+.book-bottom {
+  text-align: center;
+  position: relative;
+  z-index: 6;
+}
+.book-cover-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--text);
+  letter-spacing: 0.09em;
+  margin-bottom: 0.35rem;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+}
+.book-cover-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.6rem;
+  font-style: italic;
+  color: rgba(201,168,76,0.75);
+  letter-spacing: 0.06em;
+  margin-bottom: 0.5rem;
+}
+.book-cover-author {
+  font-family: 'Cinzel', serif;
+  font-size: 0.42rem;
+  letter-spacing: 0.25em;
+  color: rgba(201,168,76,0.5);
+  text-transform: uppercase;
+}
+
+/* Horizontal rule on cover */
+.book-rule {
+  width: 60%;
+  height: 0.5px;
+  background: linear-gradient(90deg, transparent, rgba(201,168,76,0.5), transparent);
+  margin: 0 auto 0.4rem;
+}
+
+/* ── SPINE ── */
+.book-spine {
+  position: absolute;
+  top: 0; left: 0;
+  width: 36px;
+  height: 300px;
+  transform-origin: right center;
+  transform: rotateY(-90deg) translateX(-18px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 0;
+  border-radius: 1px 0 0 1px;
+  overflow: hidden;
+}
+
+/* Spine leather texture */
+.book-spine::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      180deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.12) 2px,
+      rgba(0,0,0,0.12) 3px
+    );
+  pointer-events: none;
+}
+
+/* Spine light edge */
+.book-spine::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 3px; height: 100%;
+  background: linear-gradient(180deg,
+    rgba(255,255,255,0.18) 0%,
+    rgba(255,255,255,0.08) 50%,
+    rgba(255,255,255,0.03) 100%
+  );
+}
+
+.book-spine-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.42rem;
+  letter-spacing: 0.22em;
+  color: rgba(201,168,76,0.7);
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+}
+.book-spine-author {
+  font-family: 'Cinzel', serif;
+  font-size: 0.36rem;
+  letter-spacing: 0.18em;
+  color: rgba(201,168,76,0.4);
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  position: relative;
+  z-index: 1;
+}
+.book-spine-dec {
+  width: 1px;
+  height: 30px;
+  background: linear-gradient(180deg, transparent, rgba(201,168,76,0.4), transparent);
+  position: relative;
+  z-index: 1;
+}
+
+/* ── BACK COVER ── */
+.book-back {
+  position: absolute;
+  inset: 0;
+  transform: translateZ(-18px) rotateY(180deg);
+  backface-visibility: hidden;
+  border-radius: 3px 1px 1px 3px;
+  border-right: 1px solid rgba(201,168,76,0.08);
+}
+
+/* ── PAGES (right side stack) ── */
+.book-pages {
+  position: absolute;
+  top: 2px;
+  right: -14px;
+  width: 14px;
+  height: 296px;
+  transform: translateZ(0px);
+  overflow: hidden;
+}
+.book-pages::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    180deg,
+    #e8e0d0 0px,
+    #e8e0d0 1.5px,
+    #d4cbb8 1.5px,
+    #d4cbb8 2px,
+    #ede5d3 2px,
+    #ede5d3 3.5px,
+    #c8bfa8 3.5px,
+    #c8bfa8 4px
+  );
+  border-radius: 0 2px 2px 0;
+}
+/* slight curve on pages */
+.book-pages::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg,
+    rgba(0,0,0,0.15) 0%,
+    rgba(0,0,0,0.04) 40%,
+    rgba(255,255,255,0.06) 100%
+  );
+  border-radius: 0 2px 2px 0;
+}
+
+/* ── TOP/BOTTOM PAGES ── */
+.book-top-pages {
+  position: absolute;
+  top: -8px;
+  left: 1px;
+  right: 2px;
+  height: 8px;
+  background: repeating-linear-gradient(
+    90deg,
+    #ddd4be 0px, #ddd4be 1.5px,
+    #c8bfa8 1.5px, #c8bfa8 2px,
+    #e8e0d0 2px, #e8e0d0 3.5px,
+    #bdb49e 3.5px, #bdb49e 4px
+  );
+  transform: rotateX(90deg) translateZ(4px);
+  transform-origin: bottom center;
+}
+.book-bottom-pages {
+  position: absolute;
+  bottom: -8px;
+  left: 1px;
+  right: 2px;
+  height: 8px;
+  background: repeating-linear-gradient(
+    90deg,
+    #ddd4be 0px, #ddd4be 1.5px,
+    #c8bfa8 1.5px, #c8bfa8 2px,
+    #e8e0d0 2px, #e8e0d0 3.5px,
+    #bdb49e 3.5px, #bdb49e 4px
+  );
+  transform: rotateX(-90deg) translateZ(4px);
+  transform-origin: top center;
+}
+
+/* ── FLOATING SHADOW ── */
+.book-shadow {
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  width: 200px; height: 28px;
+  background: radial-gradient(ellipse, rgba(0,0,0,0.65) 0%, transparent 72%);
+  filter: blur(10px);
+  animation: floatShadow 5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* ── BOOK COLOR THEMES (override) ── */
+.book-1 .book-face { background: linear-gradient(150deg, #1a1535 0%, #0d0b1a 60%, #1a1535 100%); }
+.book-1 .book-spine { background: linear-gradient(90deg, #0d0b1a 0%, #1e1940 60%, #0e0c1c 100%); }
+.book-1 .book-back  { background: linear-gradient(150deg, #0d0b1a 0%, #12102a 100%); }
+
+.book-2 .book-face { background: linear-gradient(150deg, #0e1c28 0%, #081420 60%, #0e1c28 100%); }
+.book-2 .book-spine { background: linear-gradient(90deg, #081420 0%, #102030 60%, #081420 100%); }
+.book-2 .book-back  { background: linear-gradient(150deg, #081420 0%, #0c1a25 100%); }
+
+.book-3 .book-face { background: linear-gradient(150deg, #1e0c0c 0%, #120808 60%, #1e0c0c 100%); }
+.book-3 .book-spine { background: linear-gradient(90deg, #120808 0%, #200e0e 60%, #120808 100%); }
+.book-3 .book-back  { background: linear-gradient(150deg, #120808 0%, #180c0c 100%); }
+
+.book-4 .book-face { background: linear-gradient(150deg, #0c1c14 0%, #081208 60%, #0c1c14 100%); }
+.book-4 .book-spine { background: linear-gradient(90deg, #081208 0%, #0e1c10 60%, #081208 100%); }
+.book-4 .book-back  { background: linear-gradient(150deg, #081208 0%, #0c180e 100%); }
+
+/* ── BOOK INFO ── */
+.book-info {
+  flex: 1;
+  opacity: 0;
+  transform: translateX(60px);
+}
+.book-panel:nth-child(even) .book-info {
+  transform: translateX(-60px);
+}
+.book-info.visible {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1);
+}
+
+.book-num-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+.book-num-label::after {
+  content: '';
+  flex: 1;
+  max-width: 60px;
+  height: 0.5px;
+  background: var(--gold);
+  opacity: 0.4;
+}
+
+.book-title {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.04em;
+}
+.book-subtitle {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem;
+  font-style: italic;
+  color: var(--gold);
+  margin-bottom: 2rem;
+}
+
+.book-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 2rem;
+}
+.bdl { width: 40px; height: 0.5px; background: rgba(201,168,76,0.35); }
+.bdc { width: 4px; height: 4px; background: var(--gold); transform: rotate(45deg); }
+
+.book-desc {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem;
+  font-weight: 300;
+  line-height: 1.85;
+  color: var(--muted);
+  margin-bottom: 2.5rem;
+  max-width: 480px;
+}
+
+.book-features {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-bottom: 3rem;
+}
+.book-feature {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+}
+.book-feature::before {
+  content: '✦';
+  color: var(--gold);
+  font-size: 0.5rem;
+  flex-shrink: 0;
+}
+
+.book-price-row {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+.book-price {
+  font-family: 'Cinzel', serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--gold);
+}
+.book-price-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 0.2rem;
+}
+.btn-book {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--dark);
+  background: var(--gold);
+  padding: 1.1rem 2.5rem;
+  text-decoration: none;
+  transition: background 0.3s, transform 0.3s;
+  cursor: none;
+}
+.btn-book:hover {
+  background: var(--gold-light);
+  transform: translateY(-2px);
+}
+.btn-book-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: transparent;
+  border: 0.5px solid rgba(201,168,76,0.4);
+  padding: 1.1rem 2.5rem;
+  text-decoration: none;
+  transition: border-color 0.3s, background 0.3s;
+  cursor: none;
+}
+.btn-book-outline:hover {
+  border-color: var(--gold);
+  background: rgba(201,168,76,0.06);
+}
+
+/* ── BUNDLE URGENCY & HOOK ── */
+.bundle-urgency {
+  display: inline-block;
+  background: rgba(201,168,76,0.12);
+  border: 0.5px solid rgba(201,168,76,0.35);
+  color: var(--gold);
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 0.45rem 1.4rem;
+  margin-bottom: 1.8rem;
+  position: relative;
+  animation: urgencyPulse 2.5s ease-in-out infinite;
+}
+@keyframes urgencyPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(201,168,76,0); }
+  50% { box-shadow: 0 0 0 6px rgba(201,168,76,0.1); }
+}
+
+.bundle-hook {
+  max-width: 500px;
+  margin: 0 auto 2.5rem;
+  position: relative;
+}
+.bundle-hook p {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem;
+  font-style: italic;
+  color: var(--text);
+  line-height: 1.7;
+  margin-bottom: 0.8rem;
+}
+.bundle-hook-small {
+  font-size: 0.95rem !important;
+  color: var(--muted) !important;
+}
+
+.bundle-btn-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+}
+.btn-bundle-main {
+  font-size: 0.82rem !important;
+  padding: 1.4rem 4rem !important;
+  letter-spacing: 0.28em;
+  box-shadow: 0 0 30px rgba(201,168,76,0.2);
+  transition: background 0.3s, transform 0.3s, box-shadow 0.3s !important;
+}
+.btn-bundle-main:hover {
+  box-shadow: 0 0 50px rgba(201,168,76,0.4) !important;
+}
+.bundle-guarantee {
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  color: rgba(154,144,128,0.5);
+  text-transform: uppercase;
+  position: relative;
+}
+
+/* Shake keyframe for bundle button */
+@keyframes bundleShake {
+  0%,100% { transform: translateX(0) rotate(0deg); }
+  10% { transform: translateX(-4px) rotate(-1deg); }
+  20% { transform: translateX(4px) rotate(1deg); }
+  30% { transform: translateX(-4px) rotate(-0.5deg); }
+  40% { transform: translateX(4px) rotate(0.5deg); }
+  50% { transform: translateX(-3px) rotate(0deg); }
+  60% { transform: translateX(3px); }
+  70% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
+  90% { transform: translateX(-1px); }
+}
+.bundle-shake {
+  animation: bundleShake 0.6s cubic-bezier(0.36,0.07,0.19,0.97) !important;
+}
+.panel-sep {
+  position: relative;
+  z-index: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(201,168,76,0.2), transparent);
+  margin: 0 4rem;
+}
+
+/* ── BUNDLE SECTION ── */
+.bundle-section {
+  position: relative;
+  z-index: 1;
+  background: var(--dark-3);
+  border-top: 0.5px solid rgba(201,168,76,0.15);
+  border-bottom: 0.5px solid rgba(201,168,76,0.15);
+  padding: 8rem 2rem;
+  text-align: center;
+  overflow: hidden;
+}
+.bundle-glow {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px; height: 500px;
+  background: radial-gradient(ellipse, rgba(201,168,76,0.07) 0%, transparent 65%);
+  pointer-events: none;
+}
+.bundle-tag {
+  font-size: 0.62rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+.bundle-title {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(2rem, 5vw, 4rem);
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.8rem;
+  position: relative;
+}
+.bundle-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem;
+  font-style: italic;
+  color: var(--muted);
+  margin-bottom: 3rem;
+  position: relative;
+}
+.bundle-books-row {
+  display: flex;
+  justify-content: center;
+  gap: -1rem;
+  margin-bottom: 3.5rem;
+  position: relative;
+}
+.bundle-mini-book {
+  width: 220px;
+  height: 310px;
+  border: 0.5px solid rgba(201,168,76,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: -8px;
+  transition: transform 0.3s;
+  position: relative;
+  border-radius: 1px 3px 3px 1px;
+}
+.bundle-mini-book:first-child { margin-left: 0; }
+.bundle-mini-book:hover { transform: translateY(-12px); z-index: 2; }
+
+.bundle-price-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+  position: relative;
+}
+.bundle-old-price {
+  font-family: 'Cinzel', serif;
+  font-size: 1.5rem;
+  color: var(--muted);
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+.bundle-price {
+  font-family: 'Cinzel', serif;
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: var(--gold);
+  line-height: 1;
+}
+.bundle-save {
+  background: var(--gold);
+  color: var(--dark);
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 0.35rem 0.8rem;
+}
+
+/* ── TESTIMONIALS ROW ── */
+.test-strip {
+  position: relative;
+  z-index: 1;
+  padding: 6rem 2rem;
+  background: var(--dark);
+}
+.test-strip-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.test-eyebrow {
+  text-align: center;
+  font-size: 0.62rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 4rem;
+}
+.test-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  background: rgba(201,168,76,0.08);
+}
+.test-item {
+  background: var(--dark-3);
+  padding: 2.5rem;
+}
+.test-q {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 3.5rem;
+  color: var(--gold);
+  opacity: 0.25;
+  line-height: 0.8;
+  margin-bottom: 1rem;
+}
+.test-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.15rem;
+  font-style: italic;
+  color: var(--muted);
+  line-height: 1.8;
+  margin-bottom: 1.5rem;
+}
+.test-stars { color: var(--gold); font-size: 0.7rem; letter-spacing: 0.1em; margin-bottom: 0.8rem; }
+.test-name { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text); }
+.test-loc { font-size: 0.6rem; color: var(--muted); margin-top: 0.2rem; }
+
+/* ── FOOTER ── */
+footer {
+  position: relative;
+  z-index: 1;
+  background: var(--dark);
+  border-top: 0.5px solid rgba(201,168,76,0.12);
+  padding: 4rem 2rem 2rem;
+  text-align: center;
+}
+.footer-logo {
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  letter-spacing: 0.25em;
+  color: var(--gold);
+  margin-bottom: 0.5rem;
+}
+.footer-tag {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  color: var(--muted);
+  font-size: 1rem;
+  margin-bottom: 2rem;
+}
+.footer-back {
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+.footer-back:hover { color: var(--gold); }
+.footer-copy {
+  margin-top: 2rem;
+  font-size: 0.58rem;
+  letter-spacing: 0.18em;
+  color: rgba(154,144,128,0.3);
+  text-transform: uppercase;
+}
+
+/* ── RESPONSIVE TABLET ── */
+@media (max-width: 900px) {
+  nav { padding: 1.2rem 1.5rem; }
+  .nav-link { display: none; }
+  .book-inner { flex-direction: column !important; padding: 0 1.5rem; gap: 3rem; text-align: center; }
+  .book-3d-wrap { margin: 0 auto; }
+  .book-info { opacity: 1; transform: none !important; }
+  .book-num-label { justify-content: center; }
+  .book-num-label::after { display: none; }
+  .book-desc { margin: 0 auto 2rem; }
+  .book-price-row { justify-content: center; flex-wrap: wrap; gap: 1rem; }
+  .book-features { align-items: flex-start; display: inline-flex; flex-direction: column; margin: 0 auto 2rem; }
+  .test-row { grid-template-columns: 1fr; gap: 2px; }
+  .bundle-books-row { flex-wrap: wrap; justify-content: center; gap: 8px; }
+  .bundle-mini-book { margin-left: 0; }
+  body { cursor: default; }
+  #cursor-dot, #cursor-ring { display: none; }
+  #book-dots { display: none; }
+  .books-section-mobile { display: none; }
+}
+
+/* ── MOBILE PHONE: libros 2x2 ── */
+@media (max-width: 600px) {
+  body { cursor: default; }
+  #cursor-dot, #cursor-ring { display: none; }
+  #book-dots { display: none; }
+
+  .hero { padding: 5.5rem 1.2rem 4rem; }
+  .hero-eye svg { width: 50px; height: 50px; }
+  .hero-eye { margin-bottom: 1rem; }
+  .hero-tag { font-size: 0.55rem; letter-spacing: 0.22em; margin-bottom: 1rem; }
+  .hero-title { font-size: clamp(2rem, 10vw, 3rem); }
+  .hero-title .line-gold { font-size: clamp(1rem, 5vw, 1.5rem); }
+  .hero-sub { font-size: 0.88rem; margin-top: 1.2rem; max-width: 300px; margin-left: auto; margin-right: auto; }
+  .hero-scroll-hint { bottom: 1.2rem; }
+
+  /* Esconder paneles desktop */
+  .book-panel { display: none !important; }
+  .panel-sep { display: none !important; }
+
+  /* Mostrar grid 2x2 mobile */
+  .books-section-mobile {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    background: rgba(201,168,76,0.1);
+    position: relative;
+    z-index: 1;
+    margin-top: 0;
+  }
+
+  .mobile-book-card {
+    background: var(--dark-3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem 0.7rem 1.8rem;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s;
+  }
+  .mobile-book-card:hover { background: var(--dark-4); }
+  .mobile-book-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s;
+  }
+  .mobile-book-card:active::after,
+  .mobile-book-card:hover::after { transform: scaleX(1); }
+
+  .mobile-book-3d-wrap {
+    perspective: 600px;
+    margin-bottom: 1rem;
+    position: relative;
+    padding-bottom: 14px;
+  }
+  .mobile-book-3d {
+    width: 100px;
+    height: 142px;
+    position: relative;
+    transform-style: preserve-3d;
+    animation: floatBook 5s ease-in-out infinite;
+    will-change: transform;
+  }
+  .mobile-book-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    transform: translateZ(9px);
+    border-radius: 1px 2px 2px 1px;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: space-between;
+  }
+  .mobile-book-face::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 3px);
+    z-index: 1;
+  }
+  .mobile-book-face::after {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 50%;
+    background: linear-gradient(155deg, rgba(255,255,255,0.08) 0%, transparent 70%);
+    z-index: 2;
+  }
+  .mobile-book-face-border {
+    position: absolute; inset: 5px;
+    border: 0.5px solid rgba(201,168,76,0.4);
+    z-index: 3;
+  }
+  .mobile-book-spine {
+    position: absolute;
+    top: 0; left: 0;
+    width: 16px; height: 142px;
+    transform-origin: right center;
+    transform: rotateY(-90deg) translateX(-8px);
+    border-radius: 1px 0 0 1px;
+  }
+  .mobile-book-pages {
+    position: absolute;
+    top: 1px; right: -7px;
+    width: 7px; height: 140px;
+    background: repeating-linear-gradient(180deg,
+      #e8e0d0 0px,#e8e0d0 1px,
+      #d4cbb8 1px,#d4cbb8 1.5px,
+      #ede5d3 1.5px,#ede5d3 2.5px,
+      #c8bfa8 2.5px,#c8bfa8 3px
+    );
+    border-radius: 0 1px 1px 0;
+  }
+  .mobile-book-pages::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, rgba(0,0,0,0.2) 0%, transparent 65%);
+  }
+  .mobile-book-shadow {
+    position: absolute;
+    bottom: 0; left: 50%;
+    width: 80px; height: 12px;
+    background: radial-gradient(ellipse, rgba(0,0,0,0.5) 0%, transparent 70%);
+    filter: blur(4px);
+    animation: floatShadow 5s ease-in-out infinite;
+  }
+  .mobile-book-inner {
+    position: relative; z-index: 4;
+    width: 100%; height: 100%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: space-between;
+    padding: 0.6rem 0.4rem;
+    text-align: center;
+  }
+  .mb-vol {
+    font-family: 'Cinzel', serif;
+    font-size: 0.36rem;
+    letter-spacing: 0.22em;
+    color: var(--gold); opacity: 0.7;
+  }
+  .mb-symbol svg { width: 34px; height: 34px; filter: drop-shadow(0 0 3px rgba(201,168,76,0.4)); }
+  .mb-title {
+    font-family: 'Cinzel', serif;
+    font-size: 0.4rem; font-weight: 700;
+    line-height: 1.4; color: var(--text);
+    letter-spacing: 0.06em;
+  }
+  .mb-rule {
+    width: 55%; height: 0.5px;
+    background: linear-gradient(90deg, transparent, rgba(201,168,76,0.5), transparent);
+    margin: 0.15rem auto;
+  }
+  .mb-author {
+    font-family: 'Cinzel', serif;
+    font-size: 0.28rem; letter-spacing: 0.18em;
+    color: rgba(201,168,76,0.45);
+  }
+
+  .mobile-book-info { width: 100%; text-align: center; }
+  .mobile-book-title {
+    font-family: 'Cinzel', serif;
+    font-size: 0.68rem; font-weight: 700;
+    line-height: 1.3; color: var(--text);
+    margin-bottom: 0.2rem; letter-spacing: 0.04em;
+  }
+  .mobile-book-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.68rem; font-style: italic;
+    color: var(--gold); opacity: 0.8;
+    margin-bottom: 0.8rem; line-height: 1.3;
+  }
+  .mobile-book-price {
+    font-family: 'Cinzel', serif;
+    font-size: 1.25rem; font-weight: 700;
+    color: var(--gold); margin-bottom: 0.7rem;
+  }
+  .mobile-btn-book {
+    display: block;
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.55rem; font-weight: 600;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--dark); background: var(--gold);
+    padding: 0.65rem 0.5rem;
+    text-decoration: none;
+    transition: background 0.3s;
+    width: 100%; text-align: center;
+  }
+  .mobile-btn-book:hover { background: var(--gold-light); }
+
+  /* Bundle mobile */
+  .bundle-section { padding: 3.5rem 1.2rem; }
+  .bundle-title { font-size: 1.7rem; }
+  .bundle-sub { font-size: 1.05rem; margin-bottom: 2rem; }
+  .bundle-price { font-size: 2.4rem; }
+  .bundle-price-row { flex-wrap: wrap; gap: 1rem; }
+  .bundle-books-row { gap: 5px; }
+  .bundle-mini-book { width: 160px; height: 224px; }
+  .bundle-save { font-size: 0.58rem; }
+
+  /* Testimonios */
+  .test-strip { padding: 3.5rem 1rem; }
+  .test-row { grid-template-columns: 1fr; }
+  .test-item { padding: 1.8rem 1.2rem; }
+
+  /* Footer */
+  footer { padding: 2.5rem 1rem 1.5rem; }
+
+  /* Sections generales */
+  .bundle-section, .test-strip { position: relative; z-index: 1; }
+}
+
+/* ── BOOK COLOR THEMES ── */
+.book-1 .book-face { background: linear-gradient(145deg, #0e0c18 0%, #1a1530 100%); }
+.book-1 .book-spine { background: linear-gradient(180deg, #0e0c18, #1a1530); }
+.book-1 .book-face { box-shadow: inset 0 0 60px rgba(201,168,76,0.08); }
+
+.book-2 .book-face { background: linear-gradient(145deg, #0c1018 0%, #12202e 100%); }
+.book-2 .book-spine { background: linear-gradient(180deg, #0c1018, #12202e); }
+
+.book-3 .book-face { background: linear-gradient(145deg, #100c0c 0%, #201214 100%); }
+.book-3 .book-spine { background: linear-gradient(180deg, #100c0c, #201214); }
+
+.book-4 .book-face { background: linear-gradient(145deg, #0c100e 0%, #121e18 100%); }
+.book-4 .book-spine { background: linear-gradient(180deg, #0c100e, #121e18); }
+
+/* Book panel alternating bgs */
+.book-panel:nth-child(1) { background: var(--dark); }
+.book-panel:nth-child(2) { background: var(--dark-2); }
+.book-panel:nth-child(3) { background: var(--dark); }
+.book-panel:nth-child(4) { background: var(--dark-2); }
+
+/* ── PROGRESS BAR ── */
+#progress-bar {
+  position: fixed;
+  top: 0; left: 0;
+  height: 1.5px;
+  background: var(--gold);
+  z-index: 200;
+  transform-origin: left;
+  transform: scaleX(0);
+}
+
+/* ── BOOK INDEX DOTS ── */
+#book-dots {
+  position: fixed;
+  right: 2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.dot {
+  width: 6px; height: 6px;
+  border: 0.5px solid rgba(201,168,76,0.4);
+  border-radius: 50%;
+  cursor: none;
+  transition: all 0.3s;
+  position: relative;
+}
+.dot::after {
+  content: attr(data-label);
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.55rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.dot:hover::after { opacity: 1; }
+.dot.active {
+  background: var(--gold);
+  border-color: var(--gold);
+  transform: scale(1.4);
+}
+
+@media (max-width: 900px) {
+  #book-dots { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div id="cursor-dot"></div>
+<div id="cursor-ring"></div>
+<canvas id="stars"></canvas>
+<div id="progress-bar"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="gustavovidente.html" class="nav-logo">GUSTAVO VIDENTE</a>
+  <div class="nav-right">
+    <a href="#libro-1" class="nav-link">Colección</a>
+    <a href="#bundle" class="nav-link">Bundle</a>
+    <a href="https://wa.me/14074687041?text=Hola%20Gustavo%2C%20quiero%20comprar%20un%20libro" target="_blank" class="nav-wa">Comprar</a>
+  </div>
+</nav>
+
+<!-- DOTS -->
+<div id="book-dots">
+  <div class="dot active" data-target="libro-1" data-label="Libro I"></div>
+  <div class="dot" data-target="libro-2" data-label="Libro II"></div>
+  <div class="dot" data-target="libro-3" data-label="Libro III"></div>
+  <div class="dot" data-target="libro-4" data-label="Libro IV"></div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+
+  <div class="hero-eye">
+    <svg width="72" height="72" viewBox="0 0 90 90" fill="none">
+      <circle cx="45" cy="45" r="43" stroke="#C9A84C" stroke-width="0.5" opacity="0.5"/>
+      <circle cx="45" cy="45" r="34" stroke="#C9A84C" stroke-width="0.5" opacity="0.25"/>
+      <ellipse cx="45" cy="45" rx="20" ry="13" stroke="#C9A84C" stroke-width="0.8" fill="none"/>
+      <circle cx="45" cy="45" r="6" fill="#C9A84C" opacity="0.85"/>
+      <circle cx="45" cy="45" r="2.5" fill="#050508"/>
+      <path d="M25 45 Q35 29 45 27 Q55 29 65 45" stroke="#C9A84C" stroke-width="0.5" fill="none" opacity="0.4"/>
+      <path d="M30 48 Q45 58 60 48" stroke="#C9A84C" stroke-width="0.5" fill="none" opacity="0.3"/>
+    </svg>
+  </div>
+
+  <p class="hero-tag">✦ Colección Literaria ✦</p>
+
+  <h1 class="hero-title">
+    <span class="line">SABIDURÍA</span>
+    <span class="line">ANCESTRAL</span>
+    <span class="line line-gold">en cuatro volúmenes</span>
+  </h1>
+
+  <p class="hero-sub">Cuatro libros. Un viaje hacia el despertar espiritual.</p>
+  <p class="hero-sub-extended">Cada libro revela una capa de la realidad que la mayoría nunca verá.<br>Leer solo uno es como ver el cielo sin las estrellas.<br><strong style="color:var(--gold);font-weight:500;">Los cuatro juntos te dan el mapa completo.</strong></p>
+
+  <div class="hero-scroll-hint">
+    <span>Explorar</span>
+    <div class="scroll-line-anim"></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ LIBRO 1 ══════════════════════════ -->
+<div class="panel-sep"></div>
+<section class="book-panel" id="libro-1">
+  <div class="book-inner">
+
+    <div class="book-3d-wrap book-1">
+      <img src="img/book1.png" alt="El Arte de Leer el Universo" class="book-cover-img">
+    </div>
+
+    <div class="book-info" id="info-1">
+      <div class="book-num-label">Volumen I · Fundamentos</div>
+      <h2 class="book-title">El Arte de Leer<br>el Universo</h2>
+      <div class="book-subtitle">Cómo descifrar los mensajes del cosmos</div>
+      <div class="book-divider"><div class="bdl"></div><div class="bdc"></div></div>
+      <p class="book-desc">
+        Una guía profunda sobre cómo conectar con las señales que el Universo envía cada día. Aprende a interpretar sincronías, sueños proféticos y mensajes energéticos que han sido ignorados por demasiado tiempo.
+      </p>
+      <div class="book-features">
+        <div class="book-feature">240 páginas de sabiduría ancestral</div>
+        <div class="book-feature">Ejercicios de activación intuitiva</div>
+        <div class="book-feature">Guía de símbolos cósmicos</div>
+        <div class="book-feature">Disponible en formato digital y físico</div>
+      </div>
+      <div class="book-price-row">
+        <div>
+          <div class="book-price">$9.97</div>
+          <div class="book-price-label">USD · Precio especial</div>
+        </div>
+        <a href="https://wa.me/14074687041?text=Hola%20Gustavo%2C%20quiero%20el%20libro%20El%20Arte%20de%20Leer%20el%20Universo" target="_blank" class="btn-book">Obtener libro →</a>
+        <a href="#bundle" class="btn-book-outline">Ver bundle</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════ LIBRO 2 ══════════════════════════ -->
+<div class="panel-sep"></div>
+<section class="book-panel" id="libro-2">
+  <div class="book-inner">
+
+    <div class="book-3d-wrap book-2">
+      <img src="img/book2.png" alt="Cartas del Destino" class="book-cover-img">
+    </div>
+
+    <div class="book-info" id="info-2">
+      <div class="book-num-label">Volumen II · Tarot</div>
+      <h2 class="book-title">Cartas del<br>Destino</h2>
+      <div class="book-subtitle">El método Gustavo Vidente para el tarot</div>
+      <div class="book-divider"><div class="bdl"></div><div class="bdc"></div></div>
+      <p class="book-desc">
+        Aprende a leer el tarot con la metodología que Gustavo ha perfeccionado en más de 20 años de práctica espiritual. Cada carta es un portal. Cada tirada, una conversación con el más allá.
+      </p>
+      <div class="book-features">
+        <div class="book-feature">Los 78 arcanos explicados en profundidad</div>
+        <div class="book-feature">Tiradas exclusivas de Gustavo Vidente</div>
+        <div class="book-feature">Cómo desarrollar tu intuición lectora</div>
+        <div class="book-feature">Más de 5,000 predicciones como base</div>
+      </div>
+      <div class="book-price-row">
+        <div>
+          <div class="book-price">$9.97</div>
+          <div class="book-price-label">USD · Precio especial</div>
+        </div>
+        <a href="https://wa.me/14074687041?text=Hola%20Gustavo%2C%20quiero%20el%20libro%20Cartas%20del%20Destino" target="_blank" class="btn-book">Obtener libro →</a>
+        <a href="#bundle" class="btn-book-outline">Ver bundle</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════ LIBRO 3 ══════════════════════════ -->
+<div class="panel-sep"></div>
+<section class="book-panel" id="libro-3">
+  <div class="book-inner">
+
+    <div class="book-3d-wrap book-3">
+      <img src="img/book3.png" alt="Predicciones: El Método" class="book-cover-img">
+    </div>
+
+    <div class="book-info" id="info-3">
+      <div class="book-num-label">Volumen III · Videncia</div>
+      <h2 class="book-title">Predicciones:<br>El Método</h2>
+      <div class="book-subtitle">La ciencia detrás de ver el futuro</div>
+      <div class="book-divider"><div class="bdl"></div><div class="bdc"></div></div>
+      <p class="book-desc">
+        El libro que explica cómo funciona la videncia, por qué se cumplen las predicciones y cómo puedes despertar tu propia intuición. Más de 5,000 visiones cumplidas son la evidencia detrás de estas páginas.
+      </p>
+      <div class="book-features">
+        <div class="book-feature">La arquitectura de una visión profética</div>
+        <div class="book-feature">Casos reales documentados</div>
+        <div class="book-feature">Técnicas de apertura del tercer ojo</div>
+        <div class="book-feature">El poder de los sueños premonitorios</div>
+      </div>
+      <div class="book-price-row">
+        <div>
+          <div class="book-price">$9.97</div>
+          <div class="book-price-label">USD · Precio especial</div>
+        </div>
+        <a href="https://wa.me/14074687041?text=Hola%20Gustavo%2C%20quiero%20el%20libro%20Predicciones%20El%20Metodo" target="_blank" class="btn-book">Obtener libro →</a>
+        <a href="#bundle" class="btn-book-outline">Ver bundle</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════ LIBRO 4 ══════════════════════════ -->
+<div class="panel-sep"></div>
+<section class="book-panel" id="libro-4">
+  <div class="book-inner">
+
+    <div class="book-3d-wrap book-4">
+      <img src="img/book4.png" alt="Rituales de Abundancia" class="book-cover-img">
+    </div>
+
+    <div class="book-info" id="info-4">
+      <div class="book-num-label">Volumen IV · Rituales</div>
+      <h2 class="book-title">Rituales de<br>Abundancia</h2>
+      <div class="book-subtitle">El poder de los rituales que sí funcionan</div>
+      <div class="book-divider"><div class="bdl"></div><div class="bdc"></div></div>
+      <p class="book-desc">
+        Rituales probados para atraer el amor, el dinero y la protección espiritual que necesitas. Cada ritual en este libro ha sido practicado por Gustavo y verificado con miles de personas en todo el mundo hispanohablante.
+      </p>
+      <div class="book-features">
+        <div class="book-feature">40+ rituales comprobados</div>
+        <div class="book-feature">Rituales de luna llena y luna nueva</div>
+        <div class="book-feature">Protección espiritual y limpieza energética</div>
+        <div class="book-feature">Materiales accesibles y fáciles de conseguir</div>
+      </div>
+      <div class="book-price-row">
+        <div>
+          <div class="book-price">$9.97</div>
+          <div class="book-price-label">USD · Precio especial</div>
+        </div>
+        <a href="https://wa.me/14074687041?text=Hola%20Gustavo%2C%20quiero%20el%20libro%20Rituales%20de%20Abundancia" target="_blank" class="btn-book">Obtener libro →</a>
+        <a href="#bundle" class="btn-book-outline">Ver bundle</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="panel-sep"></div>
+
+<!-- ══ GRID 2x2 MOBILE (solo visible en <600px) ══ -->
+<div class="books-section-mobile" style="display:none;">
+
+  <!-- Mobile Libro 1 -->
+  <div class="mobile-book-card">
+    <div class="mobile-book-3d-wrap">
+      <img src="img/book1.png" alt="El Arte de Leer el Universo" class="mobile-book-cover-img">
+    </div>
+    <div class="mobile-book-info">
+      <div class="mobile-book-title">El Arte de Leer el Universo</div>
+      <div class="mobile-book-sub">Señales · Mensajes · Destino</div>
+      <div class="mobile-book-price">$9.97</div>
+      <a href="https://wa.me/14074687041?text=Hola%20Gustavo%2C%20quiero%20el%20libro%20El%20Arte%20de%20Leer%20el%20Universo" target="_blank" class="mobile-btn-book">Obtener →</a>
+    </div>
+  </div>
+
+  <!-- Mobile Libro 2 -->
+  <div class="mobile-book-card">
+    <div class="mobile-book-3d-wrap">
+      <img src="img/book2.png" alt="Cartas del Destino" class="mobile-book-cover-img">
+    </div>
+    <div class="mobile-book-info">
+      <div class="mobile-book-title">Cartas del Destino</div>
+      <div class="mobile-book-sub">El Método del Tarot</div>
+      <div class="mobile-book-price">$9.97</div>
+      <a href="https://wa.me/14074687041?text=Hola%20Gustavo%2C%20quiero%20el%20libro%20Cartas%20del%20Destino" target="_blank" class="mobile-btn-book">Obtener →</a>
+    </div>
+  </div>
+
+  <!-- Mobile Libro 3 -->
+  <div class="mobile-book-card">
+    <div class="mobile-book-3d-wrap">
+      <img src="img/book3.png" alt="Predicciones: El Método" class="mobile-book-cover-img">
+    </div>
+    <div class="mobile-book-info">
+      <div class="mobile-book-title">Predicciones: El Método</div>
+      <div class="mobile-book-sub">Ver el futuro con claridad</div>
+      <div class="mobile-book-price">$9.97</div>
+      <a href="https://wa.me/14074687041?text=Hola%20Gustavo%2C%20quiero%20el%20libro%20Predicciones%20El%20Metodo" target="_blank" class="mobile-btn-book">Obtener →</a>
+    </div>
+  </div>
+
+  <!-- Mobile Libro 4 -->
+  <div class="mobile-book-card">
+    <div class="mobile-book-3d-wrap">
+      <img src="img/book4.png" alt="Rituales de Abundancia" class="mobile-book-cover-img">
+    </div>
+    <div class="mobile-book-info">
+      <div class="mobile-book-title">Rituales de Abundancia</div>
+      <div class="mobile-book-sub">Amor · Dinero · Protección</div>
+      <div class="mobile-book-price">$9.97</div>
+      <a href="https://wa.me/14074687041?text=Hola%20Gustavo%2C%20quiero%20el%20libro%20Rituales%20de%20Abundancia" target="_blank" class="mobile-btn-book">Obtener →</a>
+    </div>
+  </div>
+
+</div>
+<!-- ══ FIN GRID MOBILE ══ -->
+
+<!-- ══════════════════════════ BUNDLE ══════════════════════════ -->
+<section class="bundle-section" id="bundle">
+  <div class="bundle-glow"></div>
+
+  <!-- Urgency banner -->
+  <div class="bundle-urgency">🔥 Oferta por tiempo limitado · Solo esta semana</div>
+
+  <p class="bundle-tag">✦ Colección completa ✦</p>
+  <h2 class="bundle-title">Los 4 Volúmenes</h2>
+  <p class="bundle-sub">La colección espiritual más completa en español</p>
+
+  <!-- Psychological hook -->
+  <div class="bundle-hook">
+    <p>Cada libro abre una puerta. Pero la transformación real<br>solo ocurre cuando cruzas las cuatro.</p>
+    <p class="bundle-hook-small">Miles de lectores confirman: empezar sin el bundle<br>es como ver solo la mitad del camino.</p>
+  </div>
+
+  <div class="bundle-books-row">
+    <div class="bundle-mini-book"><img src="img/book1.png" alt="Vol I" class="bundle-mini-img"></div>
+    <div class="bundle-mini-book"><img src="img/book2.png" alt="Vol II" class="bundle-mini-img"></div>
+    <div class="bundle-mini-book"><img src="img/book3.png" alt="Vol III" class="bundle-mini-img"></div>
+    <div class="bundle-mini-book"><img src="img/book4.png" alt="Vol IV" class="bundle-mini-img"></div>
+  </div>
+
+  <div class="bundle-price-row">
+    <div>
+      <div class="bundle-old-price">$39.88</div>
+      <div class="book-price-label" style="text-align:center; margin-top:0.3rem;">Precio individual</div>
+    </div>
+    <div>
+      <div class="bundle-price">$29.97</div>
+      <div class="book-price-label" style="text-align:center; margin-top:0.3rem;">Bundle completo</div>
+    </div>
+    <div class="bundle-save">Ahorra $9.91</div>
+  </div>
+
+  <div class="bundle-btn-wrap">
+    <a href="https://wa.me/14074687041?text=Hola%20Gustavo%2C%20quiero%20el%20bundle%20de%20los%204%20libros" target="_blank" class="btn-book btn-bundle-main" id="bundleBtn">
+      ✦ Obtener bundle completo ✦
+    </a>
+    <p class="bundle-guarantee">✓ Acceso inmediato &nbsp;·&nbsp; ✓ Pago seguro &nbsp;·&nbsp; ✓ Soporte directo</p>
+  </div>
+</section>
+
+<!-- TESTIMONIOS -->
+<section class="test-strip">
+  <div class="test-strip-inner">
+    <p class="test-eyebrow">✦ Lo que dicen los lectores ✦</p>
+    <div class="test-row">
+      <div class="test-item">
+        <div class="test-q">"</div>
+        <p class="test-text">Después de leer "Cartas del Destino" empecé a hacer tiradas yo sola. En un mes ya estaba ayudando a mi familia. Gustavo explica como nadie más.</p>
+        <div class="test-stars">★★★★★</div>
+        <div class="test-name">Mariela R.</div>
+        <div class="test-loc">Bogotá, Colombia</div>
+      </div>
+      <div class="test-item">
+        <div class="test-q">"</div>
+        <p class="test-text">El libro de rituales cambió mi relación con el dinero por completo. En 3 semanas de seguir sus instrucciones cerré el mejor contrato de mi vida.</p>
+        <div class="test-stars">★★★★★</div>
+        <div class="test-name">Carlos V.</div>
+        <div class="test-loc">Miami, Florida</div>
+      </div>
+      <div class="test-item">
+        <div class="test-q">"</div>
+        <p class="test-text">Compré el bundle y fue la mejor inversión espiritual que he hecho. Los 4 libros se complementan perfectamente. Es una obra completa.</p>
+        <div class="test-stars">★★★★★</div>
+        <div class="test-name">Patricia M.</div>
+        <div class="test-loc">Caracas, Venezuela</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">GUSTAVO VIDENTE</div>
+  <p class="footer-tag">Mensajes del Universo · Visiones que transforman vidas</p>
+  <a href="gustavovidente.html" class="footer-back">← Volver al sitio principal</a>
+  <p class="footer-copy">© 2025 Gustavo Vidente · Todos los derechos reservados</p>
+</footer>
+
+<script>
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+
+/* ── STARFIELD ── */
+const canvas = document.getElementById('stars');
+const ctx = canvas.getContext('2d');
+let W, H, stars = [];
+function initStars() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  stars = Array.from({length: 180}, () => ({
+    x: Math.random()*W, y: Math.random()*H,
+    r: Math.random()*1.1, a: Math.random()*0.6+0.1,
+    sp: Math.random()*0.012+0.003, ph: Math.random()*Math.PI*2
+  }));
+}
+function drawStars(t) {
+  ctx.clearRect(0,0,W,H);
+  stars.forEach(s => {
+    const a = s.a*(0.5+0.5*Math.sin(s.ph+t*s.sp));
+    ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(201,168,76,${a})`; ctx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+initStars(); requestAnimationFrame(drawStars);
+window.addEventListener('resize', initStars);
+
+/* ── CURSOR ── */
+const dot = document.getElementById('cursor-dot');
+const ring = document.getElementById('cursor-ring');
+let mx=0,my=0,rx=0,ry=0;
+window.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; });
+(function animCursor() {
+  rx += (mx-rx)*0.12; ry += (my-ry)*0.12;
+  gsap.set(dot, {x:mx, y:my});
+  gsap.set(ring, {x:rx, y:ry});
+  requestAnimationFrame(animCursor);
+})();
+document.querySelectorAll('a, button, .dot, .bundle-mini-book, .book-3d-wrap').forEach(el => {
+  el.addEventListener('mouseenter', () => ring.classList.add('hovering'));
+  el.addEventListener('mouseleave', () => ring.classList.remove('hovering'));
+});
+
+/* ── PROGRESS BAR ── */
+const bar = document.getElementById('progress-bar');
+ScrollTrigger.create({
+  start:'top top', end:'bottom bottom',
+  onUpdate: self => gsap.set(bar, {scaleX: self.progress})
+});
+
+/* ── HERO ENTRANCE ── */
+const heroTl = gsap.timeline({delay: 0.2});
+heroTl
+  .to('.hero-eye', {opacity:1, y:0, duration:1, ease:'power2.out'}, 0)
+  .to('.hero-tag', {opacity:1, duration:0.8, ease:'power2.out'}, 0.3)
+  .to('.hero-title .line', {
+    y:0, opacity:1, duration:1.1, stagger:0.12, ease:'power4.out'
+  }, 0.4)
+  .to('.hero-sub', {opacity:1, duration:0.8, ease:'power2.out'}, 0.9)
+  .to('.hero-sub-extended', {opacity:1, duration:0.9, ease:'power2.out'}, 1.15)
+  .to('.hero-scroll-hint', {opacity:1, duration:0.8, ease:'power2.out'}, 1.4);
+
+/* ── BOOK 3D PARALLAX ON SCROLL ── */
+document.querySelectorAll('.book-panel').forEach((panel, i) => {
+  const book = panel.querySelector('.book-3d');
+  if (!book) return;
+  gsap.to(book, {
+    rotateY: i%2===0 ? -5 : 5,
+    rotateX: 8,
+    scrollTrigger: {
+      trigger: panel,
+      start: 'top bottom',
+      end: 'bottom top',
+      scrub: 1.5
+    }
+  });
+});
+
+/* ── BOOK INFO REVEAL ON SCROLL ── */
+document.querySelectorAll('.book-info').forEach((info, i) => {
+  const isEven = i % 2 === 1;
+  gsap.fromTo(info,
+    { opacity:0, x: isEven ? -60 : 60 },
+    {
+      opacity:1, x:0,
+      duration:1.1, ease:'power3.out',
+      scrollTrigger: {
+        trigger: info,
+        start: 'top 75%',
+        toggleActions: 'play none none none'
+      }
+    }
+  );
+});
+
+/* ── BOOK 3D WRAP REVEAL ── */
+document.querySelectorAll('.book-3d-wrap').forEach((wrap, i) => {
+  gsap.fromTo(wrap,
+    { opacity:0, y:50, rotateY: i%2===0 ? -40 : 40 },
+    {
+      opacity:1, y:0, rotateY: i%2===0 ? -25 : -25,
+      duration:1.3, ease:'power3.out',
+      scrollTrigger: {
+        trigger: wrap,
+        start: 'top 80%',
+        toggleActions: 'play none none none'
+      }
+    }
+  );
+});
+
+/* ── BUNDLE MINI BOOKS STAGGER ── */
+gsap.fromTo('.bundle-mini-book',
+  { y:40, opacity:0 },
+  {
+    y:0, opacity:1, stagger:0.1, duration:0.8, ease:'power3.out',
+    scrollTrigger: { trigger:'.bundle-books-row', start:'top 80%' }
+  }
+);
+
+/* ── BUNDLE PRICE REVEAL ── */
+gsap.fromTo('.bundle-price',
+  { scale:0.7, opacity:0 },
+  {
+    scale:1, opacity:1, duration:0.8, ease:'back.out(1.7)',
+    scrollTrigger: { trigger:'.bundle-price-row', start:'top 80%' }
+  }
+);
+
+/* ── TESTIMONIALS STAGGER ── */
+gsap.fromTo('.test-item',
+  { y:40, opacity:0 },
+  {
+    y:0, opacity:1, stagger:0.15, duration:0.8, ease:'power3.out',
+    scrollTrigger: { trigger:'.test-row', start:'top 80%' }
+  }
+);
+
+/* ── NAV DOTS ACTIVE STATE ── */
+const panels = ['libro-1','libro-2','libro-3','libro-4'];
+const dots = document.querySelectorAll('.dot');
+
+panels.forEach((id, i) => {
+  ScrollTrigger.create({
+    trigger: '#'+id,
+    start: 'top center',
+    end: 'bottom center',
+    onEnter: () => setActiveDot(i),
+    onEnterBack: () => setActiveDot(i)
+  });
+});
+
+function setActiveDot(i) {
+  dots.forEach((d,j) => d.classList.toggle('active', j===i));
+}
+
+dots.forEach((dot, i) => {
+  dot.addEventListener('click', () => {
+    gsap.to(window, {
+      scrollTo: '#'+panels[i],
+      duration: 1.2,
+      ease: 'power3.inOut'
+    });
+  });
+});
+
+/* ── PANEL SEPARATORS REVEAL ── */
+gsap.utils.toArray('.panel-sep').forEach(sep => {
+  gsap.fromTo(sep,
+    { scaleX:0, transformOrigin:'left center' },
+    {
+      scaleX:1, duration:1.2, ease:'power3.inOut',
+      scrollTrigger: { trigger:sep, start:'top 90%' }
+    }
+  );
+});
+
+/* ── BUNDLE SHAKE cada 10s cuando está en pantalla ── */
+const bundleBtn = document.getElementById('bundleBtn');
+let bundleShakeInterval = null;
+ScrollTrigger.create({
+  trigger: '#bundle',
+  start: 'top 80%',
+  end: 'bottom top',
+  onEnter: () => {
+    // Primer shake inmediato
+    triggerShake();
+    // Repetir cada 10s
+    bundleShakeInterval = setInterval(triggerShake, 10000);
+  },
+  onLeave: () => { clearInterval(bundleShakeInterval); },
+  onEnterBack: () => {
+    triggerShake();
+    bundleShakeInterval = setInterval(triggerShake, 10000);
+  },
+  onLeaveBack: () => { clearInterval(bundleShakeInterval); }
+});
+function triggerShake() {
+  if (!bundleBtn) return;
+  bundleBtn.classList.remove('bundle-shake');
+  void bundleBtn.offsetWidth; // reflow para reiniciar animation
+  bundleBtn.classList.add('bundle-shake');
+  setTimeout(() => bundleBtn.classList.remove('bundle-shake'), 700);
+}
+
+/* ── MOBILE GRID 2x2: show/hide según breakpoint ── */
+function handleMobileGrid() {
+  const mobileGrid = document.querySelector('.books-section-mobile');
+  if (!mobileGrid) return;
+  if (window.innerWidth <= 600) {
+    mobileGrid.style.display = 'grid';
+    // Ocultar paneles desktop
+    document.querySelectorAll('.book-panel').forEach(p => p.style.display = 'none');
+    document.querySelectorAll('.panel-sep').forEach(p => p.style.display = 'none');
+  } else {
+    mobileGrid.style.display = 'none';
+    document.querySelectorAll('.book-panel').forEach(p => p.style.display = '');
+    document.querySelectorAll('.panel-sep').forEach(p => p.style.display = '');
+  }
+}
+handleMobileGrid();
+window.addEventListener('resize', handleMobileGrid);
+
+/* ── BUNDLE ENTRANCE ANIMATION ── */
+gsap.fromTo('#bundle .bundle-urgency, #bundle .bundle-tag, #bundle .bundle-title, #bundle .bundle-sub, #bundle .bundle-hook, #bundle .bundle-books-row, #bundle .bundle-price-row, #bundle .bundle-btn-wrap',
+  { y:30, opacity:0 },
+  {
+    y:0, opacity:1, stagger:0.1, duration:0.7, ease:'power3.out',
+    scrollTrigger: { trigger:'#bundle', start:'top 80%' }
+  }
+);
+document.querySelectorAll('.book-3d-wrap').forEach((wrap, i) => {
+  const book = wrap.querySelector('.book-3d');
+  // Offset float phase so each book floats at different pace
+  book.style.animationDelay = (i * -1.3) + 's';
+
+  wrap.addEventListener('mousemove', e => {
+    const r = wrap.getBoundingClientRect();
+    const x = (e.clientX - r.left - r.width/2) / (r.width/2);
+    const y = (e.clientY - r.top - r.height/2) / (r.height/2);
+    gsap.to(book, {
+      rotateY: -10 + x * 18,
+      rotateX:  4 - y * 10,
+      translateY: -10,
+      duration: 0.45,
+      ease: 'power2.out',
+      overwrite: true
+    });
+  });
+  wrap.addEventListener('mouseleave', () => {
+    gsap.to(book, {
+      rotateY: -28, rotateX: 6, translateY: 0,
+      duration: 1, ease: 'power3.out',
+      overwrite: true,
+      onComplete: () => {
+        book.style.animation = 'none';
+        book.offsetHeight; // reflow
+        book.style.animation = '';
+        book.style.animationDelay = (i * -1.3) + 's';
+      }
+    });
+  });
+});
+</script>
+</body>
+</html>
